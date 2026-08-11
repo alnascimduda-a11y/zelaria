@@ -769,18 +769,18 @@ function ChatForm() {
     if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
   }, [msgs, aiTyping]);
 
-  const handleAnswer = async (value) => {
+  const handleAnswer = async (value, msgType = 'text') => {
     if (done || submittingRef.current) return;
     submittingRef.current = true;
     const q = FORM_QUESTIONS[step];
 
     if (pendingImg) {
-      addMsg({ side: 'user', type: 'image', src: pendingImg.src, caption: 'Foto do prédio', tag: 'PRÉDIO' });
+      addMsg({ side: 'user', type: 'image', src: pendingImg.src, caption: 'Foto do condomínio', tag: 'CONDOMÍNIO' });
       // guarda o File para upload posterior
       setAnswers(prev => ({ ...prev, __imgFile: pendingImg.file }));
       setPendingImg(null);
     }
-    if (value) addMsg({ side: 'user', type: 'text', text: value });
+    if (value) addMsg({ side: 'user', type: msgType, text: value });
     setInputVal('');
 
     const newAnswers = { ...answers, [q.key]: value };
@@ -837,9 +837,11 @@ function ChatForm() {
             imagem_condominio_url,
           }]);
 
-          // dispara os e-mails via Edge Function (não bloqueia o UX)
-          supabase.functions.invoke('send-lead-email', {
-            body: {
+          // dispara os e-mails via Cloudflare Worker (não bloqueia o UX)
+          fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
               nome:             newAnswers.nome         || '',
               email:            newAnswers.email        || '',
               condominio:       newAnswers.condominio   || '',
@@ -848,8 +850,8 @@ function ChatForm() {
               telefone:         newAnswers.telefone     || '',
               dor:              newAnswers.dor          || '',
               imagem_condominio_url,
-            },
-          }).catch(() => {}); // silencia erros de e-mail — não afeta o lead
+            }),
+          }).catch(() => {}); // silencia erros — não afeta o lead
         } catch (_) {}
         setAiTyping(false);
         addMsg({ side: 'ai', type: 'success', firstName: newAnswers.nome?.split(' ')[0] || '' });
@@ -876,7 +878,7 @@ function ChatForm() {
       recRef.current = null;
       setListening(false);
       setInputVal(transcript);
-      setTimeout(() => handleAnswer(transcript), 500);
+      setTimeout(() => handleAnswer(transcript, 'audio'), 500);
     };
     rec.onend   = () => { recRef.current = null; setListening(false); };
     rec.onerror = () => { recRef.current = null; setListening(false); };
@@ -986,11 +988,11 @@ function ChatForm() {
                     <div className="flex items-center gap-2 mb-2">
                       <CheckCircle className="w-4 h-4 text-white shrink-0" />
                       <p className="text-sm font-bold text-white">
-                        {msg.firstName ? `${msg.firstName}, você está na lista! 🎉` : 'Você está na lista! 🎉'}
+                        {msg.firstName ? `Maravilha, ${msg.firstName}!` : 'Maravilha!'}
                       </p>
                     </div>
                     <p className="text-xs text-white/85 leading-relaxed">
-                      Você garantiu uma das vagas exclusivas do piloto. Quando abrirmos os primeiros acessos, você será notificado antes de qualquer outra pessoa.
+                      A partir de agora você faz parte do ecossistema Zelaria. Em breve teremos novidades — você será o primeiro a saber.
                     </p>
                   </div>
                 </div>
@@ -1004,6 +1006,24 @@ function ChatForm() {
                   </div>
                   <div className="bg-violet-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm max-w-[75%]">
                     <p className="text-sm leading-relaxed">{msg.text}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* User audio */}
+              {msg.side === 'user' && msg.type === 'audio' && (
+                <div className="flex items-end gap-2 flex-row-reverse">
+                  <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
+                    EU
+                  </div>
+                  <div className="bg-violet-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm max-w-[75%]">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <Mic className="w-2.5 h-2.5 text-white" />
+                      </div>
+                      <span className="text-[10px] text-white/70 font-semibold uppercase tracking-wide">Áudio transcrito</span>
+                    </div>
+                    <p className="text-sm leading-relaxed italic">{msg.text}</p>
                   </div>
                 </div>
               )}
