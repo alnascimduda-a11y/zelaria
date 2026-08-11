@@ -1,5 +1,5 @@
 name = "zelaria"
-compatibility_date = "2024-12-01"
+compatibility_date = "2026-08-11"
 
 [assets]
 directory = "./dist"
