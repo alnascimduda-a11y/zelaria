@@ -861,6 +861,7 @@ function ChatForm() {
           }).catch(() => {}); // silencia erros — não afeta o lead
         } catch (_) {}
         setAiTyping(false);
+        if (typeof window.gtag_report_conversion === 'function') window.gtag_report_conversion();
         addMsg({ side: 'ai', type: 'success', firstName: newAnswers.nome?.split(' ')[0] || '' });
         setDone(true);
       }, 1200);
