@@ -764,9 +764,16 @@ function ChatForm() {
     }, 800);
   }, []);
 
-  // Auto-scroll
+  // Auto-scroll — na mensagem de sucesso recua um pouco para mostrar a resposta do usuário
   useEffect(() => {
-    if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    const el = chatRef.current;
+    if (!el) return;
+    const last = msgs[msgs.length - 1];
+    if (last?.type === 'success') {
+      el.scrollTop = el.scrollHeight - el.clientHeight - 80;
+    } else {
+      el.scrollTop = el.scrollHeight;
+    }
   }, [msgs, aiTyping]);
 
   const handleAnswer = async (value, msgType = 'text') => {
@@ -935,7 +942,7 @@ function ChatForm() {
       </div>
 
       {/* Chat feed */}
-      <div ref={chatRef} className="h-[400px] overflow-y-auto px-4 py-5 flex flex-col gap-3 bg-slate-50/50">
+      <div ref={chatRef} className="h-[460px] overflow-y-auto px-4 py-5 flex flex-col gap-3 bg-slate-50/50">
         <AnimatePresence initial={false}>
           {msgs.map((msg) => (
             <motion.div
