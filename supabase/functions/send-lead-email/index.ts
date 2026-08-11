@@ -109,8 +109,8 @@ serve(async (req) => {
         <tr>
           <td style="background:linear-gradient(135deg,#7c3aed,#a855f7);padding:40px 40px 32px;text-align:center">
             <p style="margin:0;font-size:32px">✨</p>
-            <h1 style="margin:12px 0 0;color:#ffffff;font-size:28px;font-weight:800">${firstName}, você está dentro!</h1>
-            <p style="margin:10px 0 0;color:#ddd6fe;font-size:15px;line-height:1.5">Sua vaga no piloto exclusivo da Zelaria está reservada.</p>
+            <h1 style="margin:12px 0 0;color:#ffffff;font-size:26px;font-weight:800">Maravilha, ${firstName}!</h1>
+            <p style="margin:10px 0 0;color:#ddd6fe;font-size:15px;line-height:1.5">Você agora faz parte do ecossistema Zelaria.</p>
           </td>
         </tr>
 
@@ -118,20 +118,16 @@ serve(async (req) => {
         <tr>
           <td style="padding:36px 40px">
             <p style="margin:0 0 20px;font-size:15px;color:#334155;line-height:1.7">
-              Olá, <strong>${firstName}</strong>! Ficamos muito felizes em ter o <strong>${condominio}</strong> no nosso piloto.
-            </p>
-            <p style="margin:0 0 20px;font-size:15px;color:#334155;line-height:1.7">
-              Estamos selecionando os primeiros condomínios para validar a Zelaria em campo.
-              Quando sua vaga for ativada, você será o <strong>primeiro a saber</strong> — antes de qualquer lançamento público.
+              A partir de agora, <strong>${firstName}</strong>, você faz parte do ecossistema da Zelaria.
+              Em breve teremos novidades e disponibilizaremos primeiramente para você e para o <strong>${condominio}</strong>.
             </p>
 
-            <!-- O que esperar -->
             <div style="background:#faf5ff;border-radius:12px;padding:24px;margin:24px 0">
               <p style="margin:0 0 16px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7c3aed">O que vem a seguir</p>
               <table cellpadding="0" cellspacing="0">
-                ${step('1', 'Análise do seu perfil', 'Revisamos as informações do ' + condominio + ' para adequação ao piloto.')}
-                ${step('2', 'Contato em até 48h', 'Nossa equipe entra em contato pelo WhatsApp ' + (telefone ? '(' + telefone + ')' : '') + ' para agendar uma demo.')}
-                ${step('3', 'Acesso antecipado', 'Você ativa a Zelaria antes do lançamento público — sem custo no piloto.')}
+                ${step('1', 'Análise do seu perfil', 'Revisamos o perfil do ' + condominio + ' para adequação ao piloto.')}
+                ${step('2', 'Contato prioritário', 'Nossa equipe entrará em contato pelo WhatsApp ' + (telefone ? '(' + telefone + ')' : '') + ' para apresentar as novidades.')}
+                ${step('3', 'Acesso antecipado', 'Você será o primeiro a conhecer e ativar a Zelaria — antes de qualquer lançamento público.')}
               </table>
             </div>
 
@@ -144,7 +140,7 @@ serve(async (req) => {
         <!-- Footer -->
         <tr>
           <td style="background:#f8fafc;padding:20px 40px;border-top:1px solid #e2e8f0;text-align:center">
-            <p style="margin:0;font-size:12px;color:#94a3b8">Zelaria · Facilities Guiados por IA · <a href="https://zelaria.com.br" style="color:#a855f7;text-decoration:none">zelaria.com.br</a></p>
+            <p style="margin:0;font-size:12px;color:#94a3b8">Zelaria · Inteligência Condominial com IA · <a href="https://zelaria.com.br" style="color:#a855f7;text-decoration:none">zelaria.com.br</a></p>
           </td>
         </tr>
 
@@ -157,7 +153,7 @@ serve(async (req) => {
     // Dispara os dois em paralelo
     await Promise.all([
       sendEmail(FROM_ADMIN, ADMIN_EMAIL, `🏢 Nova lead — ${nome} · ${condominio}`, adminHtml),
-      sendEmail(FROM_LEAD,  email,       `${firstName}, você está na lista! ✨ — Zelaria`, leadHtml),
+      sendEmail(FROM_LEAD,  email,       `Maravilha, ${firstName}! Você faz parte do ecossistema Zelaria ✨`, leadHtml),
     ]);
 
     return new Response(JSON.stringify({ ok: true }), {

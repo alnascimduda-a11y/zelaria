@@ -10,6 +10,8 @@ import {
   Play,
   ChevronRight,
   CheckCircle,
+  Check,
+  Trash2,
   Zap,
   Sparkles,
 } from 'lucide-react';
@@ -723,6 +725,7 @@ function ChatForm() {
   const fileRef      = useRef(null);
   const bootedRef    = useRef(false);
   const submittingRef = useRef(false);
+  const recRef       = useRef(null);
 
   const uid    = () => `${Date.now()}-${Math.random()}`;
   const addMsg = (m) => setMsgs((p) => [...p, { ...m, uid: uid() }]);
@@ -870,26 +873,30 @@ function ChatForm() {
     rec.lang = 'pt-BR';
     rec.onresult = (e) => {
       const transcript = e.results[0][0].transcript.trim();
+      recRef.current = null;
       setListening(false);
-      const q = FORM_QUESTIONS[step];
-      if (q?.type === 'select') {
-        // Tenta casar a fala com uma das opções
-        const lower = transcript.toLowerCase();
-        const match = q.options.find((o) =>
-          lower.split(' ').some((w) => w.length > 3 && o.toLowerCase().includes(w))
-        );
-        if (match) handleAnswer(match);
-        // Se não casou, o usuário pode falar de novo ou clicar
-      } else {
-        // Preenche e envia automaticamente após breve pausa
-        setInputVal(transcript);
-        setTimeout(() => handleAnswer(transcript), 500);
-      }
+      setInputVal(transcript);
+      setTimeout(() => handleAnswer(transcript), 500);
     };
-    rec.onend   = () => setListening(false);
-    rec.onerror = () => setListening(false);
+    rec.onend   = () => { recRef.current = null; setListening(false); };
+    rec.onerror = () => { recRef.current = null; setListening(false); };
+    recRef.current = rec;
     setListening(true);
     rec.start();
+  };
+
+  const stopVoice = () => {
+    // Encerra a gravação — onresult dispara com o que foi capturado
+    if (recRef.current) recRef.current.stop();
+  };
+
+  const cancelVoice = () => {
+    if (recRef.current) {
+      recRef.current.onresult = null; // impede envio automático
+      recRef.current.stop();
+      recRef.current = null;
+    }
+    setListening(false);
   };
 
   const handleFile = (e) => {
@@ -1062,24 +1069,41 @@ function ChatForm() {
             </button>
           ) : listening ? (
             /* ── Gravando — estilo WhatsApp ─────────────────────────────── */
-            <div className="flex items-center gap-3 px-4 py-2.5 bg-violet-50 border border-violet-200 rounded-full">
-              <div className="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0 animate-pulse" />
-              <div className="flex-1 flex items-end gap-0.5 h-5">
-                {[3,6,10,7,14,9,12,5,8,4,11,6].map((h, i) => (
-                  <div
-                    key={i}
-                    className="flex-1 bg-violet-500 rounded-full origin-bottom"
-                    style={{
-                      height: `${h}px`,
-                      animation: 'waveBar 0.5s ease-in-out infinite alternate',
-                      animationDelay: `${i * 0.05}s`,
-                    }}
-                  />
-                ))}
+            <div className="flex items-center gap-2">
+              {/* Cancelar */}
+              <button
+                onClick={cancelVoice}
+                className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center shrink-0 text-red-500 hover:bg-red-200 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+              {/* Waveform + timer */}
+              <div className="flex-1 flex items-center gap-3 px-4 py-2.5 bg-violet-50 border border-violet-200 rounded-full">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0 animate-pulse" />
+                <div className="flex-1 flex items-end gap-0.5 h-5">
+                  {[3,6,10,7,14,9,12,5,8,4,11,6].map((h, i) => (
+                    <div
+                      key={i}
+                      className="flex-1 bg-violet-500 rounded-full origin-bottom"
+                      style={{
+                        height: `${h}px`,
+                        animation: 'waveBar 0.5s ease-in-out infinite alternate',
+                        animationDelay: `${i * 0.05}s`,
+                      }}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs font-mono text-slate-500 shrink-0 tabular-nums">
+                  {`${Math.floor(recSecs / 60)}:${String(recSecs % 60).padStart(2, '0')}`}
+                </span>
               </div>
-              <span className="text-xs font-mono text-slate-500 shrink-0 tabular-nums">
-                {`${Math.floor(recSecs / 60)}:${String(recSecs % 60).padStart(2, '0')}`}
-              </span>
+              {/* Enviar */}
+              <button
+                onClick={stopVoice}
+                className="w-9 h-9 rounded-full bg-violet-600 flex items-center justify-center shrink-0 text-white hover:bg-violet-500 transition-colors"
+              >
+                <Check className="w-4 h-4" />
+              </button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
