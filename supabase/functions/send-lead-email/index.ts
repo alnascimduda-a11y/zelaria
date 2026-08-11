@@ -29,7 +29,7 @@ serve(async (req) => {
     const {
       nome = '', email = '', condominio = '', cep = '',
       apartamentos = '', telefone = '', dor = '',
-      imagem_predio_url = '',
+      imagem_condominio_url = '',
     } = await req.json();
 
     const firstName = nome.split(' ')[0] || nome;
@@ -71,12 +71,12 @@ serve(async (req) => {
               <p style="margin:0;font-size:14px;color:#1e1b4b;line-height:1.6">${dor || '—'}</p>
             </div>
 
-            ${imagem_predio_url ? `
+            ${imagem_condominio_url ? `
             <!-- Foto -->
             <div style="margin-top:24px;text-align:center">
               <p style="margin:0 0 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b">Foto da Fachada</p>
-              <a href="${imagem_predio_url}" target="_blank">
-                <img src="${imagem_predio_url}" alt="Fachada" style="max-width:100%;border-radius:12px;border:1px solid #e2e8f0" />
+              <a href="${imagem_condominio_url}" target="_blank">
+                <img src="${imagem_condominio_url}" alt="Fachada" style="max-width:100%;border-radius:12px;border:1px solid #e2e8f0" />
               </a>
             </div>` : ''}
           </td>

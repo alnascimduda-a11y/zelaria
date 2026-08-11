@@ -808,17 +808,17 @@ function ChatForm() {
       setTimeout(async () => {
         try {
           // upload da foto do prédio para Supabase Storage
-          let imagem_predio_url = '';
+          let imagem_condominio_url = '';
           const imgFile = newAnswers.__imgFile;
           if (imgFile) {
             const ext  = imgFile.name.split('.').pop();
-            const path = `predios/${Date.now()}.${ext}`;
+            const path = `condominios/${Date.now()}.${ext}`;
             const { data: upData, error: upErr } = await supabase.storage
-              .from('predios')
+              .from('condominios')
               .upload(path, imgFile, { upsert: false });
             if (!upErr && upData) {
-              const { data: urlData } = supabase.storage.from('predios').getPublicUrl(upData.path);
-              imagem_predio_url = urlData?.publicUrl || '';
+              const { data: urlData } = supabase.storage.from('condominios').getPublicUrl(upData.path);
+              imagem_condominio_url = urlData?.publicUrl || '';
             }
           }
 
@@ -831,7 +831,7 @@ function ChatForm() {
             condominio:        newAnswers.condominio   || '',
             apartamentos:      newAnswers.apartamentos || '',
             telefone:          newAnswers.telefone     || '',
-            imagem_predio_url,
+            imagem_condominio_url,
           }]);
 
           // dispara os e-mails via Edge Function (não bloqueia o UX)
@@ -844,7 +844,7 @@ function ChatForm() {
               apartamentos:     newAnswers.apartamentos || '',
               telefone:         newAnswers.telefone     || '',
               dor:              newAnswers.dor          || '',
-              imagem_predio_url,
+              imagem_condominio_url,
             },
           }).catch(() => {}); // silencia erros de e-mail — não afeta o lead
         } catch (_) {}
@@ -1195,7 +1195,7 @@ export default function App() {
           </div>
           <h2 className="text-3xl font-black text-white mb-4">Controle assumido.</h2>
           <p className="text-zinc-400 text-lg leading-relaxed">
-            Nossa equipe entrará em contato. Prepare-se para ver sua operação predial
+            Nossa equipe entrará em contato. Prepare-se para ver sua operação condominial
             com clareza total.
           </p>
         </motion.div>
@@ -1243,7 +1243,7 @@ export default function App() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/30 bg-purple-500/8 text-purple-300 text-xs font-bold uppercase tracking-widest mb-8 font-mono">
               <Zap className="w-3 h-3" />
-              Plataforma de Inteligência Predial — IA
+              Plataforma de Inteligência Condominial — IA
             </div>
 
             <div className="mb-6">
@@ -1251,7 +1251,7 @@ export default function App() {
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.15] mb-6 tracking-tight">
-              A sua operação predial é uma{' '}
+              A sua operação condominial é uma{' '}
               <span className="bg-gradient-to-r from-fuchsia-400 to-purple-400 bg-clip-text text-transparent">
                 caixa preta de despesas
               </span>{' '}
@@ -1261,7 +1261,7 @@ export default function App() {
             <p className="text-lg sm:text-xl lg:text-2xl text-zinc-300 max-w-3xl mx-auto mb-10 leading-relaxed">
               Zelaria é a malha de{' '}
               <strong className="text-white">Inteligência Artificial</strong>{' '}
-              que blinda a sua operação predial. Substituímos planilhas cegas por uma
+              que blinda a sua operação condominial. Substituímos planilhas cegas por uma
               auditoria autônoma que roda{' '}
               <strong className="text-white">24/7</strong>: da medição de concessionárias
               ao compliance, do estoque à ronda de limpeza.{' '}
