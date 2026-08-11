@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://zelaria.com.br/sitemap.xml
